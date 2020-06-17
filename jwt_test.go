@@ -49,8 +49,8 @@ func TestJWT(t *testing.T) {
 
 func getJWT(exp time.Time) string {
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), &Payload{
-		Name:           "Joe Doe",
-		StandardClaims: jwt.StandardClaims{ExpiresAt: exp.Unix()},
+		Name:      "Joe Doe",
+		ExpiresAt: float64(exp.Unix()),
 	})
 
 	tokenstring, err := token.SignedString([]byte(jwtsecret))
