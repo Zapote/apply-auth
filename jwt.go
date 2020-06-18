@@ -17,6 +17,13 @@ func Init(jwtsecret string) {
 	secret = jwtsecret
 }
 
+//NewJWT creates a new JWT string
+func NewJWT(p *Payload) (string, error) {
+	k := []byte(secret)
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, p)
+	return t.SignedString(k)
+}
+
 //JWT authorizes incoming request header Authorization
 func JWT(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
