@@ -20,19 +20,23 @@ func TestJWT(t *testing.T) {
 	Init(jwtsecret)
 
 	testCases := []struct {
-		name string
-		code int
-		jwt  string
+		name   string
+		code   int
+		jwt    string
+		target string
 	}{
-		{"No token returns StatusUnauthorized", http.StatusUnauthorized, ""},
-		{"Invalid token returns StatusUnauthorized", http.StatusUnauthorized, "invalid"},
-		{"Valid token returns StatusOK", http.StatusOK, getJWT(time.Now().Add(time.Minute * 1))},
-		{"Expired token returns StatusUnauthorized", http.StatusUnauthorized, getJWT(time.Now().Add(time.Minute * -1))},
+		{"No token returns StatusUnauthorized", http.StatusUnauthorized, "", "/"},
+		{"Invalid token returns StatusUnauthorized", http.StatusUnauthorized, "invalid", "/"},
+		{"Valid token returns StatusOK", http.StatusOK, getJWT(time.Now().Add(time.Minute * 1)), "/"},
+		{"Expired token returns StatusUnauthorized", http.StatusUnauthorized, getJWT(time.Now().Add(time.Minute * -1)), "/"},
+		{"Allow anonymous does not require JWT", http.StatusOK, "", "/allowed"},
 	}
+
+	AllowAnonymous("/allowed", "GET")
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", "/", nil)
+			req := httptest.NewRequest("GET", tc.target, nil)
 			rc := httptest.NewRecorder()
 			h := fmt.Sprintf("Bearer %s", tc.jwt)
 

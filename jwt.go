@@ -41,7 +41,7 @@ func JWT(next http.Handler) http.Handler {
 		uri := r.RequestURI
 		method := r.Method
 		for _, u := range allowed {
-			if strings.HasPrefix(u.uri, uri) && u.method == method {
+			if strings.HasPrefix(uri, u.uri) && u.method == method {
 				next.ServeHTTP(w, r)
 				return
 			}
