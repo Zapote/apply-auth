@@ -11,10 +11,21 @@ import (
 )
 
 var secret string
+var allowed []resource
 
 //Init JWT middleware with jwtsecret
 func Init(jwtsecret string) {
 	secret = jwtsecret
+}
+
+//AllowAnonymous adds uri to anonymous allowed uris
+func AllowAnonymous(uri string, method string) {
+	allowed = append(allowed, resource{uri, method})
+}
+
+type resource struct {
+	uri    string
+	method string
 }
 
 //NewJWT creates a new JWT string
@@ -27,6 +38,15 @@ func NewJWT(p *Payload) (string, error) {
 //JWT authorizes incoming request header Authorization
 func JWT(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
+		uri := r.RequestURI
+		method := r.Method
+		for _, u := range allowed {
+			if strings.HasPrefix(u.uri, uri) && u.method == method {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+
 		h := r.Header.Get("Authorization")
 		h = strings.Replace(h, "Bearer ", "", -1)
 
