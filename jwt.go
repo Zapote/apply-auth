@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -38,10 +39,10 @@ func NewJWT(p *Payload) (string, error) {
 //JWT authorizes incoming request header Authorization
 func JWT(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		uri := r.RequestURI
+		url, _ := url.ParseRequestURI(r.RequestURI)
 		method := r.Method
 		for _, u := range allowed {
-			if strings.HasPrefix(uri, u.uri) && u.method == method {
+			if strings.HasPrefix(url.Path, u.uri) && u.method == method {
 				next.ServeHTTP(w, r)
 				return
 			}

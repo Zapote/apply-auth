@@ -29,7 +29,7 @@ func TestJWT(t *testing.T) {
 		{"Invalid token returns StatusUnauthorized", http.StatusUnauthorized, "invalid", "/"},
 		{"Valid token returns StatusOK", http.StatusOK, getJWT(time.Now().Add(time.Minute * 1)), "/"},
 		{"Expired token returns StatusUnauthorized", http.StatusUnauthorized, getJWT(time.Now().Add(time.Minute * -1)), "/"},
-		{"Allow anonymous does not require JWT", http.StatusOK, "", "/allowed"},
+		{"Allow anonymous does not require JWT", http.StatusOK, "", "http://example.com/allowed"},
 	}
 
 	AllowAnonymous("/allowed", "GET")
