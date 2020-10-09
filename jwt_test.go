@@ -61,6 +61,7 @@ func getJWT(exp time.Time) string {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 	return tokenstring
 }
 
