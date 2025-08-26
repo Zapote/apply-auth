@@ -1,8 +1,7 @@
 module github.com/zapote/apply-auth
 
-go 1.14
+go 1.25
 
-require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/google/uuid v1.1.2
-)
+require github.com/google/uuid v1.6.0
+
+require github.com/golang-jwt/jwt/v5 v5.3.0

@@ -8,18 +8,18 @@ import (
 	"net/url"
 	"strings"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var secret string
 var allowed []resource
 
-//Init JWT middleware with jwtsecret
+// Init JWT middleware with jwtsecret
 func Init(jwtsecret string) {
 	secret = jwtsecret
 }
 
-//AllowAnonymous adds uri to anonymous allowed uris
+// AllowAnonymous adds uri to anonymous allowed uris
 func AllowAnonymous(uri string, method string) {
 	allowed = append(allowed, resource{uri, method})
 }
@@ -29,14 +29,14 @@ type resource struct {
 	method string
 }
 
-//NewJWT creates a new JWT string
+// NewJWT creates a new JWT string
 func NewJWT(p *Payload) (string, error) {
 	k := []byte(secret)
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, p)
 	return t.SignedString(k)
 }
 
-//JWT authorizes incoming request header Authorization
+// JWT authorizes incoming request header Authorization
 func JWT(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		url, _ := url.ParseRequestURI(r.RequestURI)
@@ -54,7 +54,7 @@ func JWT(next http.Handler) http.Handler {
 		token, err := jwt.ParseWithClaims(h, &Payload{}, getPayload)
 
 		if err != nil {
-			log.Println(fmt.Sprintf("JWT: %s", err.Error()))
+			log.Printf("JWT: %s", err.Error())
 			response(w, 401, "Unauthorized")
 			return
 		}
@@ -71,7 +71,7 @@ func JWT(next http.Handler) http.Handler {
 
 func getPayload(t *jwt.Token) (interface{}, error) {
 	if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-		return nil, fmt.Errorf("Unexpected signing method: %v", t.Header["alg"])
+		return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 	}
 
 	return []byte(secret), nil
